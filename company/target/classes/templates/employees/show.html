@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<head>
+	<title>Show employee - company</title>
+</head>
+<body>
+	<div class="container" layout:fragment="content">
+		<h1>Show employee</h1>
+		<div th:object="${employee}">
+			<div>
+				<label>ID</label>
+				<p th:text="*{id}"></p>
+			</div>
+			<div>
+				<label>名前</label>
+				<p th:text="*{name}"></p>
+			</div>
+			<div>
+				<label>年齢</label>
+				<p th:text="*{age}"></p>
+			</div>
+			<div>
+				<label>性別</label>
+				<p th:text="*{sex}"></p>
+			</div>
+			<div>
+				<label>住所</label>
+				<p th:text="*{address}"></p>
+			</div>
+			<div>
+				<label>電話番号</label>
+				<p th:text="*{tel}"></p>
+			</div>
+		</div>
+		<div>
+			<a class="btn btn-default" th:href="@{/employees/{id}/edit(id=*{id})}">編集</a>
+		</div>
+		<div class="pull-right">
+			<a class="btn btn-link" href="/employees">一覧画面へ</a>
+		</div>
+	</div>
+</body>
+</html>

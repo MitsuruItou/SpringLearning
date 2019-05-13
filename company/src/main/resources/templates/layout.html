@@ -11,7 +11,23 @@
 		<script src="/js/company/employee.js"><</script>
 	</head>
 	<body>
-		<!-- ③ -->
+		<header th:fragment="header">
+			<div class="container">
+				<h2>Employee Management</h2>
+				<div class="pull-right" th:if="${loginForm.flg}" th:object="${loginForm}">
+					ユーザID:<span th:text="*{userid}"></span>
+					氏名:<span th:text="*{name}"></span>
+					<a class="btn btn-link" href="/employees/logout">ログアウト</a>
+				</div>
+			</div>
+		</header>
 		<div layout:fragment="content"></div>
+		<footer th:fragment="footer">
+			<div class="container">
+				<div class="pull-right" th:if="${loginForm.flg}">
+					<a class="btn btn-link" href="/employees/list">一覧画面へ</a>
+				</div>
+			</div>
+		</footer>
 	</body>
 </html>

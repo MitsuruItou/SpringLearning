@@ -23,6 +23,18 @@ public class EmployeeService {
 		return employeeRepository.findById(id);
 	}
 
+	public List<Employee> findByNameLike(String word) {
+		return employeeRepository.findByNameLike(word);
+	}
+
+	public List<Employee> findByAgeBetween(int fromAge, int toAge) {
+		return employeeRepository.findByAgeBetween(fromAge, toAge);
+	}
+
+	public List<Employee> findByUserid(String userid) {
+		return employeeRepository.findByUserid(userid);
+	}
+
 	public Employee save(Employee employee) {
 		return employeeRepository.save(employee);
 	}

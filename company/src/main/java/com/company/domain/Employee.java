@@ -14,6 +14,12 @@ public class Employee {
 	@GeneratedValue(generator = "id_seq")
 	private long id;
 
+	@Column(name = "user_id")
+	private String userid;
+
+	@Column(name = "pass")
+	private String pass;
+
 	@Column(name = "name")
 	private String name;
 
@@ -34,6 +40,18 @@ public class Employee {
 	}
 	public void setId(long id) {
 		this.id = id;
+	}
+	public String getUserid() {
+		return userid;
+	}
+	public void setUserid(String userid) {
+		this.userid = userid;
+	}
+	public String getPass() {
+		return pass;
+	}
+	public void setPass(String pass) {
+		this.pass = pass;
 	}
 	public String getName() {
 		return name;
@@ -68,6 +86,6 @@ public class Employee {
 
 	@Override
 	public String toString() {
-		return "Employee [id=" + id + ", name=" + name + ", age=" + age + ", sex=" + sex + ", address=" + address + ", tel=" + tel + "]";
+		return "Employee [id=" + id + ", userid=" + userid + ", pass=" + pass + ", name=" + name + ", age=" + age + ", sex=" + sex + ", address=" + address + ", tel=" + tel + "]";
 	}
 }

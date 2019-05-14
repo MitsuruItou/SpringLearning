@@ -7,7 +7,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.http.MediaType;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,22 +17,19 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.method.HandlerMethod;
 
 import com.company.domain.Employee;
 import com.company.domain.LoginForm;
+import com.company.domain.SearchForm;
 import com.company.service.EmployeeService;
 
-@RestController
+@Controller
 @EnableAutoConfiguration
-@RequestMapping("/employees")
+@RequestMapping("employees")
 @SessionAttributes(value = "loginForm")
 public class EmployeeController {
 	@Autowired
@@ -43,103 +41,108 @@ public class EmployeeController {
 	}
 
 	@GetMapping
-	public ModelAndView index(ModelAndView mav) {
-		mav.setViewName("employees/login");
-		return mav;
+	public String index(Model model) {
+		return "employees/login";
 	}
 
-	@PostMapping("login")
-	public ModelAndView login(LoginForm form) {
-		ModelAndView mav = new ModelAndView();
-		List<Employee> employees = employeeService.findByUserid(form.getUserid());
-		if (employees.size() < 1) {
-			mav.addObject("errMessage", "指定したユーザは存在しません。");
-			mav.setViewName("/employees/login");
-		} else {
-			Employee emp = employees.get(0);
-			if (emp.getPass().equals(form.getPass())) {
-				form.setName(emp.getName());
-				form.setFlg(true);
-				List<Employee> allEmployees = employeeService.findAll();
-				mav.addObject("employees", allEmployees);
-				mav.setViewName("/employees/list");
-			} else {
-				mav.addObject("errMessage","パスワードに誤りがあります。");
-				mav.setViewName("/employees/login");
-			}
-		}
-
-		return mav;
+	@GetMapping("login")
+	public String login(LoginForm form, Model model) throws Exception {
+		throw new Exception();
+//		List<Employee> employees = employeeService.findByUserid(form.getUserid());
+//		if (employees.size() < 1) {
+//			model.addAttribute("errMessage", "指定したユーザは存在しません。");
+//			return "employees/login";
+//		} else {
+//			Employee emp = employees.get(0);
+//			if (emp.getPass().equals(form.getPass())) {
+//				form.setName(emp.getName());
+//				form.setFlg(true);
+//				return "redirect:/employees/list";
+//			} else {
+//				model.addAttribute("errMessage","パスワードに誤りがあります。");
+//				return "employees/login";
+//			}
+//		}
 	}
 
 	@GetMapping("logout")
-	public ModelAndView logout(SessionStatus sessionStatus) {
+	public String logout(SessionStatus sessionStatus) {
 		sessionStatus.setComplete();
-		return new ModelAndView("redirect:/employees");
+		return "redirect:/employees";
 	}
 
 	@GetMapping("list")
-	public ModelAndView list(ModelAndView mav) {
+	public String list(Model model) {
+		model.addAttribute("searchForm", new SearchForm());
 		List<Employee> employees = employeeService.findAll();
-		mav.addObject("employees", employees);
-		return mav;
+		model.addAttribute("employees", employees);
+		return "employees/search";
 	}
 
 	@GetMapping("new")
-	public ModelAndView newEmployee(ModelAndView mav) {
+	public String newEmployee(Model model) {
 
 		Employee employee = new Employee();
-		mav.addObject("employee",employee);
-		mav.setViewName("employees/new");
-		return mav;
+		model.addAttribute("employee",employee);
+		return "employees/new";
 	}
 
 	@GetMapping("{id}/edit")
-	public ModelAndView edit(@PathVariable Long id, ModelAndView mav) {
+	public String edit(@PathVariable Long id, Model model) {
 		Optional<Employee> employee = employeeService.findById(id);
-		mav.addObject("employee", employee.get());
-		mav.setViewName("employees/edit");
-		return mav;
+		model.addAttribute("employee", employee.get());
+		return "employees/edit";
 	}
 
-	@GetMapping("{id}")
-	public ModelAndView show(@PathVariable Long id, ModelAndView mav) {
+	@GetMapping("{id}/show")
+	public String show(@PathVariable Long id, Model model) {
 		Optional<Employee> employee = employeeService.findById(id);
-		mav.addObject("employee", employee.get());
-		mav.setViewName("employees/show");
-		return mav;
+		model.addAttribute("employee", employee.get());
+		return "employees/show";
 	}
 
-	@RequestMapping(method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE)
-	@ResponseBody
-	public Employee create(@RequestBody Employee employee) {
-		employeeService.save(employee);
-		return employee;
-	}
-
-	@PutMapping("{id}")
-	public ModelAndView update(@PathVariable Long id, @Valid @ModelAttribute Employee employee, BindingResult bindingResult) {
+	@PostMapping
+	public String create(@Valid @ModelAttribute Employee employee, BindingResult bindingResult, Model model) {
 		if (bindingResult.hasErrors()) {
-			return new ModelAndView("/employees/edit");
+			return "employees/new";
+		}
+		List<Employee> list = employeeService.findByUserid(employee.getUserid());
+		if (list.size() > 0) {
+			model.addAttribute("errMsg", "指定したユーザIDは既に存在します。");
+			return "employees/new";
+		}
+		employeeService.save(employee);
+		return "redirect:/employees/list";
+	}
+
+	@PutMapping("{id}/update")
+	public String update(@PathVariable Long id, @Valid @ModelAttribute Employee employee, BindingResult bindingResult) {
+		if (bindingResult.hasErrors()) {
+			return "employees/edit";
 		}
 		employee.setId(id);
 		employeeService.save(employee);
-		return new ModelAndView("redirect:/employees/list");
+		return "redirect:/employees/list";
 	}
 
-	@DeleteMapping("{id}")
-	public ModelAndView destroy(@PathVariable Long id) {
+	@DeleteMapping("{id}/delete")
+	public String destroy(@PathVariable Long id) {
 		employeeService.delete(id);
-		return new ModelAndView("redirect:/employees/list");
+		return "redirect:/employees/list";
+	}
+
+	@GetMapping("search")
+	public String search(@ModelAttribute SearchForm form, Model model) {
+		List<Employee> list = employeeService.findEmployees(form.getName(), form.getAgeFrom(), form.getAgeTo(), form.getSex());
+		model.addAttribute("employees", list);
+		return "employees/search::list";
 	}
 
 	@ExceptionHandler(Exception.class)
-	public ModelAndView allExceptionHandler() {
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/employees/error");
-		mav.addObject("errMessage", "例外が発生しました。再度、一覧画面から操作を実行してください。");
+	public String allExceptionHandler(HandlerMethod handlerMethod) {
+//		model.addAttribute("errMessage", "例外が発生しました。再度、一覧画面から操作を実行してください。");
 
-		return mav;
+		return "employees/error";
 	}
 
 }

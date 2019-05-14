@@ -7,7 +7,7 @@
 	<div th:replace="layout::header"></div>
 	<div class="container" layout:fragment="content">
 		<h3>Login employees</h3>
-		<form th:action="@{/employees/login}" th:method="post" th:object="${loginForm}">
+		<form th:action="@{/employees/login}" th:method="get" th:object="${loginForm}">
 			<div class="form-group">
 				<label class="control-label">ユーザID</label>
 				<input class="form-control" type="text" th:field="*{userid}" />

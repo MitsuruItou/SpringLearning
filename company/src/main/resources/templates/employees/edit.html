@@ -7,7 +7,7 @@
 	<div th:fragment="layout::header"></div>
 	<div class="container" layout:fragment="content">
 		<h3>Editing employee</h3>
-		<form id="editEmployee" th:action="@{/employees/{id}(id=*{id})}" th:method="put" th:object="${employee}">
+		<form id="editEmployee" th:action="@{/employees/{id}/update(id=*{id})}" th:method="put" th:object="${employee}">
 			<input class="form-control" type="hidden" th:field="*{userid}"/>
 			<input class="form-control" type="hidden" th:field="*{pass}"/>
 			<div class="form-group" th:classappend="${#fields.hasErrors('name')}? has-error">

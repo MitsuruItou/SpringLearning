@@ -5,6 +5,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Entity
 @SequenceGenerator(name = "id_seq", sequenceName = "id_seq", allocationSize = 1, initialValue = 1)
@@ -14,18 +18,25 @@ public class Employee {
 	@GeneratedValue(generator = "id_seq")
 	private long id;
 
+	@NotEmpty
 	@Column(name = "user_id")
 	private String userid;
 
+	@NotEmpty
 	@Column(name = "pass")
 	private String pass;
 
+	@NotEmpty
+	@Size(max=10)
 	@Column(name = "name")
 	private String name;
 
+	@Min(value = 0)
+	@Max(value = 150)
 	@Column(name = "age")
 	private int age;
 
+	@NotEmpty
 	@Column(name = "sex")
 	private String sex;
 

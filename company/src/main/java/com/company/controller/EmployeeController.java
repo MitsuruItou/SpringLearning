@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
-import org.springframework.web.method.HandlerMethod;
 
 import com.company.domain.Employee;
 import com.company.domain.LoginForm;
@@ -41,28 +39,28 @@ public class EmployeeController {
 	}
 
 	@GetMapping
-	public String index(Model model) {
+	public String index(SessionStatus sessionStatus, Model model) {
+		sessionStatus.setComplete();
 		return "employees/login";
 	}
 
 	@GetMapping("login")
-	public String login(LoginForm form, Model model) throws Exception {
-		throw new Exception();
-//		List<Employee> employees = employeeService.findByUserid(form.getUserid());
-//		if (employees.size() < 1) {
-//			model.addAttribute("errMessage", "指定したユーザは存在しません。");
-//			return "employees/login";
-//		} else {
-//			Employee emp = employees.get(0);
-//			if (emp.getPass().equals(form.getPass())) {
-//				form.setName(emp.getName());
-//				form.setFlg(true);
-//				return "redirect:/employees/list";
-//			} else {
-//				model.addAttribute("errMessage","パスワードに誤りがあります。");
-//				return "employees/login";
-//			}
-//		}
+	public String login(LoginForm form, Model model) {
+		List<Employee> employees = employeeService.findByUserid(form.getUserid());
+		if (employees.size() < 1) {
+			model.addAttribute("errMessage", "指定したユーザは存在しません。");
+			return "employees/login";
+		} else {
+			Employee emp = employees.get(0);
+			if (emp.getPass().equals(form.getPass())) {
+				form.setName(emp.getName());
+				form.setFlg(true);
+				return "redirect:/employees/list";
+			} else {
+				model.addAttribute("errMessage","パスワードに誤りがあります。");
+				return "employees/login";
+			}
+		}
 	}
 
 	@GetMapping("logout")
@@ -136,13 +134,6 @@ public class EmployeeController {
 		List<Employee> list = employeeService.findEmployees(form.getName(), form.getAgeFrom(), form.getAgeTo(), form.getSex());
 		model.addAttribute("employees", list);
 		return "employees/search::list";
-	}
-
-	@ExceptionHandler(Exception.class)
-	public String allExceptionHandler(HandlerMethod handlerMethod) {
-//		model.addAttribute("errMessage", "例外が発生しました。再度、一覧画面から操作を実行してください。");
-
-		return "employees/error";
 	}
 
 }

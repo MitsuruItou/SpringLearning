@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="errLayout">
 <head>
 	<title>Error Occured - company</title>
 </head>
 <body>
-	<!-- <div th:replace="layout::header"></div> -->
+	<div th:fragment="layout::header"></div>
 	<div class="container" layout:fragment="content">
 		<h3>Error Occured</h3>
 		<p th:text="${errMessage}"></p>
+		<p th:text="${errDetail}"></p>
 	</div>
-	<!-- <div th:replace="layout::footer"></div> -->
+	<div th:fragment="layout::footer"></div>
 </body>
 </html>

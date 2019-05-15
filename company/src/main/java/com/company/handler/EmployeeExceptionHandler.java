@@ -14,7 +14,7 @@ public class EmployeeExceptionHandler {
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public String allExceptionHandler(Exception exception, Model model) {
 		model.addAttribute("errMessage", "例外が発生しました。再度、一覧画面から操作を実行してください。");
-
+		model.addAttribute("errDetail","Exception:" + exception.getClass().getName());
 		return "employees/error";
 	}
 }

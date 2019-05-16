@@ -105,15 +105,15 @@ public class EmployeeRepositoryTest {
 	@Test
 	public void findByUserid() {
 
-		List<Employee> list = employeeRepository.findByUserid("test1");
+		Employee emp = employeeRepository.findByUserid("test1");
 
-		assertThat(list.size()).isEqualTo(1);
+		assertThat(emp).isEqualTo(1);
 
-		assertThat(list.get(0).getUserid()).isEqualTo("test1");
-		assertThat(list.get(0).getPass()).isEqualTo("test1pass");
-		assertThat(list.get(0).getName()).isEqualTo("テスト1");
-		assertThat(list.get(0).getAge()).isEqualTo(20);
-		assertThat(list.get(0).getSex()).isEqualTo("男性");
+		assertThat(emp.getUserid()).isEqualTo("test1");
+		assertThat(emp.getPass()).isEqualTo("test1pass");
+		assertThat(emp.getName()).isEqualTo("テスト1");
+		assertThat(emp.getAge()).isEqualTo(20);
+		assertThat(emp.getSex()).isEqualTo("男性");
 
 
 	}

@@ -14,13 +14,22 @@
 			</div>
 			<div class="form-group">
 				<label class="control-label"> 年齢</label>
-				<input class="form-control" type="text" th:field="*{ageFrom}"/>
+				<select class="form-control" th:field="*{ageFrom}">
+					<option value="0"></option>
+					<option th:each="item : ${ageCombo}" th:value="${item.value}" th:text="${item.value}">combo</option>
+				</select>
 				～
-				<input class="form-control" type="text" th:field="*{ageTo}"/>
+				<select class="form-control" th:field="*{ageTo}">
+					<option value="0"></option>
+					<option th:each="item : ${ageCombo}" th:value="${item.value}" th:text="${item.value}">combo</option>
+				</select>
 			</div>
 			<div class="form-group">
 				<label class="control-label"> 性別</label>
-				<input class="form-control" type="text" th:field="*{sex}"/>
+				<select class="form-control" th:field="*{sex}">
+					<option value=""></option>
+					<option th:each="item : ${sexCombo}" th:value="${item.value}" th:text="${item.value}">combo</option>
+				</select>
 			</div>
 			<button class="btn btn-default" type="button" onclick="onClickSearch()">検索</button>
 		</form>

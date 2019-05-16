@@ -1,6 +1,8 @@
 package com.company.controller;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -46,14 +48,13 @@ public class EmployeeController {
 
 	@GetMapping("login")
 	public String login(LoginForm form, Model model) {
-		List<Employee> employees = employeeService.findByUserid(form.getUserid());
-		if (employees.size() < 1) {
+		Employee employees = employeeService.findByUserid(form.getUserid());
+		if (employees == null) {
 			model.addAttribute("errMessage", "指定したユーザは存在しません。");
 			return "employees/login";
 		} else {
-			Employee emp = employees.get(0);
-			if (emp.getPass().equals(form.getPass())) {
-				form.setName(emp.getName());
+			if (employees.getPass().equals(form.getPass())) {
+				form.setName(employees.getName());
 				form.setFlg(true);
 				return "redirect:/employees/list";
 			} else {
@@ -74,14 +75,17 @@ public class EmployeeController {
 		model.addAttribute("searchForm", new SearchForm());
 		List<Employee> employees = employeeService.findAll();
 		model.addAttribute("employees", employees);
+		model.addAttribute("ageCombo", getAgeValMap());
+		model.addAttribute("sexCombo", getSexValMap());
 		return "employees/search";
 	}
 
 	@GetMapping("new")
 	public String newEmployee(Model model) {
-
 		Employee employee = new Employee();
 		model.addAttribute("employee",employee);
+		model.addAttribute("ageCombo", getAgeValMap());
+		model.addAttribute("sexRadio", getSexValMap());
 		return "employees/new";
 	}
 
@@ -89,6 +93,8 @@ public class EmployeeController {
 	public String edit(@PathVariable Long id, Model model) {
 		Optional<Employee> employee = employeeService.findById(id);
 		model.addAttribute("employee", employee.get());
+		model.addAttribute("ageCombo", getAgeValMap());
+		model.addAttribute("sexRadio", getSexValMap());
 		return "employees/edit";
 	}
 
@@ -104,8 +110,8 @@ public class EmployeeController {
 		if (bindingResult.hasErrors()) {
 			return "employees/new";
 		}
-		List<Employee> list = employeeService.findByUserid(employee.getUserid());
-		if (list.size() > 0) {
+		Employee list = employeeService.findByUserid(employee.getUserid());
+		if (list != null) {
 			model.addAttribute("errMsg", "指定したユーザIDは既に存在します。");
 			return "employees/new";
 		}
@@ -134,6 +140,25 @@ public class EmployeeController {
 		List<Employee> list = employeeService.findEmployees(form.getName(), form.getAgeFrom(), form.getAgeTo(), form.getSex());
 		model.addAttribute("employees", list);
 		return "employees/search::list";
+	}
+
+	public Map<String, String> getAgeValMap() {
+		Map<String, String> retMap = new LinkedHashMap<String, String>();
+
+		for (int i = 1; i <= 100; i++) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(i);
+			retMap.put(sb.toString(), sb.toString());
+		}
+
+		return retMap;
+	}
+
+	public Map<String, String> getSexValMap() {
+		Map<String, String> retMap = new LinkedHashMap<String, String>();
+		retMap.put("男性", "男性");
+		retMap.put("女性", "女性");
+		return retMap;
 	}
 
 }

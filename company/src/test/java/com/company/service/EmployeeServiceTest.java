@@ -96,17 +96,15 @@ public class EmployeeServiceTest {
 	@Test
 	public void findByUserid() {
 
-		List<Employee> list = new ArrayList<>();
 
 		Employee emp1 = makeTestEmployee(1, "test1", "test1", "test1", 20, "", "", "");
 
-		list.add(emp1);
 
-		when(this.employeeRepository.findByUserid("test1")).thenReturn(list);
+		when(this.employeeRepository.findByUserid("test1")).thenReturn(emp1);
 
-		List<Employee> actual = this.employeeService.findByUserid("test1");
+		Employee actual = this.employeeService.findByUserid("test1");
 
-		assertThat(actual).isEqualTo(list);
+		assertThat(actual).isEqualTo(emp1);
 
 		verify(this.employeeRepository, times(1)).findByUserid("test1");
 	}

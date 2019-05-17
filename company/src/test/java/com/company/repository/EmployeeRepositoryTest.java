@@ -107,8 +107,6 @@ public class EmployeeRepositoryTest {
 
 		Employee emp = employeeRepository.findByUserid("test1");
 
-		assertThat(emp).isEqualTo(1);
-
 		assertThat(emp.getUserid()).isEqualTo("test1");
 		assertThat(emp.getPass()).isEqualTo("test1pass");
 		assertThat(emp.getName()).isEqualTo("テスト1");

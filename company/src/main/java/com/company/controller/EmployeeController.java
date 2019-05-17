@@ -1,14 +1,18 @@
 package com.company.controller;
 
-import java.util.LinkedHashMap;
+import static com.company.constants.MsgConst.*;
+import static com.company.constants.PathConst.*;
+import static com.company.util.CommonUtils.*;
+
 import java.util.List;
-import java.util.Map;
+import java.util.Locale;
 import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -32,8 +36,12 @@ import com.company.service.EmployeeService;
 @RequestMapping("employees")
 @SessionAttributes(value = "loginForm")
 public class EmployeeController {
+
 	@Autowired
 	private EmployeeService employeeService;
+
+	@Autowired
+	private MessageSource msg;
 
 	@ModelAttribute("loginForm")
 	LoginForm loginForm() {
@@ -41,25 +49,30 @@ public class EmployeeController {
 	}
 
 	@GetMapping
-	public String index(SessionStatus sessionStatus, Model model) {
+	public String index(SessionStatus sessionStatus) {
 		sessionStatus.setComplete();
-		return "employees/login";
+		return EMP_LOGIN;
 	}
 
 	@GetMapping("login")
-	public String login(LoginForm form, Model model) {
-		Employee employees = employeeService.findByUserid(form.getUserid());
+	public String login(@Valid LoginForm form, BindingResult result, Model model) {
+		if (result.hasErrors()) {
+			return EMP_LOGIN;
+		}
+		String userid = form.getUserid();
+		Employee employees = employeeService.findByUserid(userid);
 		if (employees == null) {
-			model.addAttribute("errMessage", "指定したユーザは存在しません。");
-			return "employees/login";
+			model.addAttribute("errMsg",
+					msg.getMessage(MSG_USER_NOT_EXISTS, new String[] { userid }, Locale.JAPAN));
+			return EMP_LOGIN;
 		} else {
 			if (employees.getPass().equals(form.getPass())) {
 				form.setName(employees.getName());
 				form.setFlg(true);
-				return "redirect:/employees/list";
+				return EMP_LIST_REDIRECT;
 			} else {
-				model.addAttribute("errMessage","パスワードに誤りがあります。");
-				return "employees/login";
+				model.addAttribute("errMsg", msg.getMessage(MSG_PASS_MISTAKEN, null, Locale.JAPAN));
+				return EMP_LOGIN;
 			}
 		}
 	}
@@ -67,7 +80,7 @@ public class EmployeeController {
 	@GetMapping("logout")
 	public String logout(SessionStatus sessionStatus) {
 		sessionStatus.setComplete();
-		return "redirect:/employees";
+		return EMP_REDIRECT;
 	}
 
 	@GetMapping("list")
@@ -77,16 +90,16 @@ public class EmployeeController {
 		model.addAttribute("employees", employees);
 		model.addAttribute("ageCombo", getAgeValMap());
 		model.addAttribute("sexCombo", getSexValMap());
-		return "employees/search";
+		return EMP_SEARCH;
 	}
 
 	@GetMapping("new")
 	public String newEmployee(Model model) {
 		Employee employee = new Employee();
-		model.addAttribute("employee",employee);
+		model.addAttribute("employee", employee);
 		model.addAttribute("ageCombo", getAgeValMap());
 		model.addAttribute("sexRadio", getSexValMap());
-		return "employees/new";
+		return EMP_NEW;
 	}
 
 	@GetMapping("{id}/edit")
@@ -95,70 +108,54 @@ public class EmployeeController {
 		model.addAttribute("employee", employee.get());
 		model.addAttribute("ageCombo", getAgeValMap());
 		model.addAttribute("sexRadio", getSexValMap());
-		return "employees/edit";
+		return EMP_EDIT;
 	}
 
 	@GetMapping("{id}/show")
 	public String show(@PathVariable Long id, Model model) {
 		Optional<Employee> employee = employeeService.findById(id);
 		model.addAttribute("employee", employee.get());
-		return "employees/show";
+		return EMP_SHOW;
 	}
 
 	@PostMapping
 	public String create(@Valid @ModelAttribute Employee employee, BindingResult bindingResult, Model model) {
 		if (bindingResult.hasErrors()) {
-			return "employees/new";
+			return EMP_NEW;
 		}
-		Employee list = employeeService.findByUserid(employee.getUserid());
-		if (list != null) {
-			model.addAttribute("errMsg", "指定したユーザIDは既に存在します。");
-			return "employees/new";
+		String userid = employee.getUserid();
+		Employee emp = employeeService.findByUserid(userid);
+		if (emp != null) {
+			model.addAttribute("errMsg",
+					msg.getMessage(MSG_USER_ALLREADY_EXISTS, new String[] { userid }, Locale.JAPAN));
+			return EMP_NEW;
 		}
 		employeeService.save(employee);
-		return "redirect:/employees/list";
+		return EMP_LIST_REDIRECT;
 	}
 
 	@PutMapping("{id}/update")
 	public String update(@PathVariable Long id, @Valid @ModelAttribute Employee employee, BindingResult bindingResult) {
 		if (bindingResult.hasErrors()) {
-			return "employees/edit";
+			return EMP_EDIT;
 		}
 		employee.setId(id);
 		employeeService.save(employee);
-		return "redirect:/employees/list";
+		return EMP_LIST_REDIRECT;
 	}
 
 	@DeleteMapping("{id}/delete")
 	public String destroy(@PathVariable Long id) {
 		employeeService.delete(id);
-		return "redirect:/employees/list";
+		return EMP_LIST_REDIRECT;
 	}
 
 	@GetMapping("search")
 	public String search(@ModelAttribute SearchForm form, Model model) {
-		List<Employee> list = employeeService.findEmployees(form.getName(), form.getAgeFrom(), form.getAgeTo(), form.getSex());
+		List<Employee> list = employeeService.findEmployees(form.getName(), form.getAgeFrom(), form.getAgeTo(),
+				form.getSex());
 		model.addAttribute("employees", list);
-		return "employees/search::list";
-	}
-
-	public Map<String, String> getAgeValMap() {
-		Map<String, String> retMap = new LinkedHashMap<String, String>();
-
-		for (int i = 1; i <= 100; i++) {
-			StringBuilder sb = new StringBuilder();
-			sb.append(i);
-			retMap.put(sb.toString(), sb.toString());
-		}
-
-		return retMap;
-	}
-
-	public Map<String, String> getSexValMap() {
-		Map<String, String> retMap = new LinkedHashMap<String, String>();
-		retMap.put("男性", "男性");
-		retMap.put("女性", "女性");
-		return retMap;
+		return EMP_SEARCH + "::list";
 	}
 
 }

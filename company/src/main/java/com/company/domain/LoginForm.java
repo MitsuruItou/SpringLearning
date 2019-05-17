@@ -1,9 +1,19 @@
 package com.company.domain;
 
-public class LoginForm {
+import java.io.Serializable;
 
+import javax.validation.constraints.NotEmpty;
+
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+
+@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+public class LoginForm implements Serializable {
+
+	@NotEmpty
 	private String userid;
 
+	@NotEmpty
 	private String pass;
 
 	private String name;

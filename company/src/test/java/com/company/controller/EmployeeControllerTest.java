@@ -8,7 +8,6 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,14 +67,12 @@ public class EmployeeControllerTest {
 		loginForm.setUserid("test");
 		loginForm.setPass("test");
 
-		List<Employee> list = new ArrayList<>();
 		Employee emp = new Employee();
 		emp.setUserid("test");
 		emp.setPass("test");
 		emp.setName("テスト");
-		list.add(emp);
 
-		when(service.findByUserid("test")).thenReturn(list);
+		when(service.findByUserid("test")).thenReturn(emp);
 
 		mockMvc.perform(get("/employees/login").sessionAttr("loginForm", loginForm))
 			.andExpect(status(). isFound())
@@ -92,14 +89,12 @@ public class EmployeeControllerTest {
 		loginForm.setUserid("test");
 		loginForm.setPass("test");
 
-		List<Employee> list = new ArrayList<>();
 		Employee emp = new Employee();
 		emp.setUserid("test");
 		emp.setPass("test1");
 		emp.setName("テスト");
-		list.add(emp);
 
-		when(service.findByUserid("test")).thenReturn(list);
+		when(service.findByUserid("test")).thenReturn(emp);
 
 		mockMvc.perform(get("/employees/login").sessionAttr("loginForm", loginForm))
 			.andExpect(status().isOk())
@@ -192,10 +187,7 @@ public class EmployeeControllerTest {
 	@Test
 	public void create_2() throws Exception {
 
-		List<Employee> list = new ArrayList<>();
-		list.add(new Employee());
-
-		when(service.findByUserid("test")).thenReturn(list);
+		when(service.findByUserid("test")).thenReturn(new Employee());
 
 		mockMvc.perform(post("/employees").param("id", "1").param("userid", "test")
 				.param("pass", "test").param("name", "test").param("age", "20").param("sex", "male"))
